@@ -4,10 +4,14 @@ This module is under construction
 
 ## To do
 
+####Npm
+- Create npm package
+
 ####Docs
+- Install
 - Error template
-- params
-- example
+- Params
+- Example
 
 ####Validations
 
