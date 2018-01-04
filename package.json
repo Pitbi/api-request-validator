@@ -1,0 +1,31 @@
+{
+  "name": "api-request-validator",
+  "version": "0.0.1",
+  "description": "Validate API call parameters",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com:Pitbi/api-request-validator.git"
+  },
+  "keywords": [
+    "api",
+    "requests",
+    "validation",
+    "validator",
+    "call",
+    "rest",
+    "http",
+    "header",
+    "payload",
+    "body"
+  ],
+  "author": "Pierre Biezemans",
+  "license": "MIT",
+  "homepage": "https://github.com/Pitbi/api-request-validator.git#readme",
+  "dependencies": {
+    "lodash": "^4.17.4"
+  }
+}
