@@ -1,3 +1,1 @@
-var Validator = require('./src/Validator')
-
-module.exports = Validator
+module.exports = require('./build/Validator')

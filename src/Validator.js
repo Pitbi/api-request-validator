@@ -3,13 +3,12 @@ const _ = require('lodash')
 class Validator {
     constructor(validations = {}, data = {}) {
         //Set params to this
-        this.validations = validations  //Validations rules
-        this.data = data                //Data to validate
-        
+        this.validations = validations //Validations rules
+        this.data = data //Data to validate
         //Default values
         this.isValid = true
         this.error = null
-        this.warnings = []
+        this.warnings = {}
         this.fallbacks = {}
 
         //Run validations
@@ -29,37 +28,88 @@ class Validator {
     /*Check all validations types (required, value)*/
     validate(validation, data) {
         this.checkRequired(validation, data)
+        this.checkType(validation, data)
+        this.checkRegexp(validation, data)
         this.checkValue(validation, data)
     }
 
     /*If the required option is true in validation, we check if data is not undefined*/
     checkRequired(validation, data) {
-        if (validation.required && !data)
-            this.throw(validation, 'required')
+        if (!validation.required)
+            return
+
+        if (validation.dependent && 
+            validation.dependentValue && 
+            this.data[validation.dependent] && 
+            this.data[validation.dependent] === validation.dependentValue &&
+            data === undefined
+        )
+            return this.throw(validation, 'required')
+
+        if (!validation.dependent && validation.required && data === undefined)
+            return this.throw(validation, 'required')
     }
 
     /*Value check (function, regexp, ...)*/
     checkValue(validation, data) {
         if (!validation.value || !this.isValid)
             return
-        
-        if (validation.value.fn)
+        if (validation.value.func)
             return this.checkValueFn(validation, data)
+        if (validation.value.enum && data && validation.value.enum.indexOf(data) === -1)
+            this.throw(validation, 'value')
     }
 
     /*Run value validation function (if validation.value is a function)*/
     checkValueFn(validation, data) {
-        if (!validation.value.fn(data))
+        if (!validation.value.func(data))
             this.throw(validation, 'value')
     }
 
+    checkRegexp(validation, data) {
+        if (!validation.regexp || !validation.regexp.match || !this.isValid)
+            return
+
+        if (!validation.regexp.match.exec(data))
+            this.throw(validation, 'regexp')
+    }
+
+    checkType(validation, data) {
+        if (!validation.type || !data)
+            return
+        const { type } = validation.type
+
+        const switchType = (type) => {
+            switch(type) {
+
+            case 'number':
+                const int = parseInt(data)
+                return typeof(int) === 'number' && !isNaN(int)
+
+            case 'string':
+                return typeof(data) === 'string'
+
+            case 'object':
+                return _.isObject(data)
+
+            case 'boolean':
+                return _.isBoolean(data)
+
+            default: return true
+
+            }
+        }
+
+        const isValid = switchType(type)
+        if (!isValid)
+            this.throw(validation, 'type')
+    }
 
     /*****ERROR AND WARNING*****/
     
     /*Throw warning or error*/
     throw(validation, validationRule) {
-        const { types = {} } = validation
-        if (validation[validationRule].type === 'warning')
+        if (validation[validationRule].warning)
             return this.throwWarning(validation, validationRule)
         this.throwError(validation, validationRule)
     }
@@ -69,23 +119,17 @@ class Validator {
         this.isValid = false
         this.error = {}
 
-        if (validation[validationRule].code)
-            this.error.code = validation[validationRule].code
-        if (validation[validationRule].message)
-            this.error.err = validation[validationRule].message
-        if (validation[validationRule].info)
-            this.error.info = validation[validationRule].info
+        if (validation[validationRule].error)
+            this.error = validation[validationRule].error
     }
 
     /*Throw warning*/
     throwWarning(validation, validationRule) {
-        let warning = validation[validationRule].message || ''
-        if (validation[validationRule].info)
-            warning += ` ${validation[validationRule].info}` 
-        this.warnings.push(warning)
-        if (validation[validationRule].fallback)
-            this.fallbacks[validation.key] = validation[validationRule].fallback
+        this.warnings[validation[validationRule].warning.message] = validation[validationRule].warning.info || ''
+        const fallback = validation[validationRule].fallback || validation.fallback
+        if (fallback)
+            this.fallbacks[validation.key] = fallback
     }
 }
 
-module.exports = Validator
+export default Validator
