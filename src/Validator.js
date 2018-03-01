@@ -1,7 +1,7 @@
 const _ = require('lodash')
 
 class Validator {
-    constructor(validations = {}, data = {}) {
+    constructor(validations = {}, data = {}, options = {}) {
         //Set params to this
         this.validations = validations //Validations rules
         this.data = data //Data to validate
@@ -117,8 +117,8 @@ class Validator {
     /*Throw error*/
     throwError(validation, validationRule) {
         this.isValid = false
-        this.error = {}
-
+        if (!this.error)
+            this.error = {}
         if (validation[validationRule].error)
             this.error = validation[validationRule].error
     }
