@@ -55,7 +55,7 @@ const RULES = {
 		},
 		type: {
 			error: LOGIN_ERROR_EMAIL__TYPE_ERROR,
-			data: 'number'
+			data: 'string'
 		},
 		methods: ['findExisting', 'isBlacklisted']
 	},
@@ -111,18 +111,7 @@ app.post('/login, async (req, res, next) => {
 ````
 ## To do
 
-####Npm
-- Create npm package
-
-####Docs
-- Install
-- Error template
-- Params
-- Example
-
-####Validations
-
-- Async function
-- Regexp
-
-####Tests
+- write correct documentation
+- tests
+- examples
+- imrove :)
