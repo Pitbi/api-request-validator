@@ -103,8 +103,13 @@ class LoginValidator extends Validator {
 ````sheet
 app.post('/login, async (req, res, next) => {
 	const validator = new LoginValidator(req.body)
+	await valiadtor.run()
 	if (!validator.valid)
 		return next(validator.error)
+	if (validator.warnings)
+		res.header('api-warnings', validator.warnings)
+	
+	...
 })
 ````
 ## To do
