@@ -1,6 +1,6 @@
 {
   "name": "api-request-validator",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Validate API call parameters",
   "main": "index.js",
   "scripts": {
@@ -45,7 +45,9 @@
   "config": {
     "pre-git": {
       "commit-msg": "",
-      "pre-commit": ["yarn build"],
+      "pre-commit": [
+        "yarn build"
+      ],
       "pre-push": [],
       "post-commit": [],
       "post-checkout": [],
