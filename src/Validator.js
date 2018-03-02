@@ -13,7 +13,17 @@ class Validator {
     }
 
     async run () {
+        await this.beforeValidate()
         await this.makeValidations()
+        await this.afterValidate()
+    }
+
+    /***Hooks***/
+    async beforeValidate() {
+        return true
+    }
+    async adterValidate() {
+        return true
     }
 
     /*****VALIDATIONS*****/

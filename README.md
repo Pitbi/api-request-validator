@@ -57,10 +57,6 @@ const RULES = {
 			error: LOGIN_ERROR_EMAIL__TYPE_ERROR,
 			data: 'number'
 		},
-		func: {
-			warning: LOGIN_WARNING_EMAIL__DANGEROUS,
-			data: (data) => !data.match('@devil.com') //==> return valid: error if undefined, false or null
-		},
 		methods: ['findExisting', 'isBlacklisted']
 	},
 	password: {
@@ -99,6 +95,7 @@ class LoginValidator extends Validator {
     }
 }
 ````
+####With express
 
 ````sheet
 app.post('/login, async (req, res, next) => {
