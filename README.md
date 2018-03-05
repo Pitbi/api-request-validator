@@ -53,6 +53,7 @@ api-request-validator export a class constructor. The best way to build the vali
 ````sheet
 import Validator from 'api-request-validator'
 
+
 const RULES = {
 	email: {
     required: {
