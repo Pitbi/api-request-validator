@@ -41,7 +41,7 @@ To validate the email attribute, we use followings rules:
 - regexp
 - custom async methods
 
-####Constructor
+#### Constructor
 
 api-request-validator export a class constructor. The best way to build the validator is to extend the Validator class and set `RULES` as first argument of `super()` in `constructor()`:
 
@@ -102,7 +102,7 @@ api-request-validator export a class constructor. The best way to build the vali
     const LOGIN_ERROR_EMAIL__TYPE_ERROR = { ... }
     const LOGIN_WARNING_EMAIL__DANGEROUS = { ... }
 
-####Validate express payload
+#### Validate express payload
 
     app.post('/login, async (req, res, next) => {
       const validator = new LoginValidator(req.body)
