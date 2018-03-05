@@ -22,7 +22,7 @@ class Validator {
     async beforeValidate() {
         return true
     }
-    async adterValidate() {
+    async afterValidate() {
         return true
     }
 
