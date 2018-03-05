@@ -27,7 +27,6 @@ A library to validate API requests attributes
 
 ### Simple example: login request validation
 
-
 In our example, the accepted **payload** of the request is like this: 
 
     {
@@ -90,8 +89,6 @@ api-request-validator export a class constructor. The best way to build the vali
         ...
       }
     }
-
-
 
 ##### Examples of errors 
 
