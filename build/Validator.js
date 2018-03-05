@@ -110,7 +110,7 @@ var Validator = function () {
             return beforeValidate;
         }()
     }, {
-        key: 'adterValidate',
+        key: 'afterValidate',
         value: function () {
             var _ref3 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee3() {
                 return _regenerator2.default.wrap(function _callee3$(_context3) {
@@ -127,11 +127,11 @@ var Validator = function () {
                 }, _callee3, this);
             }));
 
-            function adterValidate() {
+            function afterValidate() {
                 return _ref3.apply(this, arguments);
             }
 
-            return adterValidate;
+            return afterValidate;
         }()
 
         /*****VALIDATIONS*****/
