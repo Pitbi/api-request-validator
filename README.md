@@ -55,16 +55,16 @@ import Validator from 'api-request-validator'
 
 const RULES = {
 	email: {
-    	required: {
-    		error: LOGIN_ERROR_EMAIL_REQUIRED
+    required: {
+      error: LOGIN_ERROR_EMAIL_REQUIRED
 		},
 		type: {
 			error: LOGIN_ERROR_EMAIL__TYPE_ERROR,
-			data: 'string'
+      data: 'string'
 		},
 		regexp: {
-		    error: LOGIN_ERROR_EMAIL_INVALID,
-		    data: /^([a-zA-Z0-9_\.\-\+])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,6})+$/
+      error: LOGIN_ERROR_EMAIL_INVALID,
+      data: /^([a-zA-Z0-9_\.\-\+])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,6})+$/
 		},
 		methods: ['findExisting', 'isBlacklisted']
 	},
@@ -74,26 +74,26 @@ const RULES = {
 }
 	
 class LoginValidator extends Validator {
-    constructor(payload) {
-        super(RULES, payload, {})
-    }
-    
-    async beforeValidate() {
-    
-    }
-    
-    async afterValidate() {
-    
-    }
-    
-    async findExisting(email) {
-    	const existing = await User.findOne({ email ))
-    	return !existing
-    }
-    
-    async isBlacklisted(email) {
-    	...
-    }
+  constructor(payload) {
+    super(RULES, payload, {})
+  }
+  
+  async beforeValidate() {
+  
+  }
+  
+  async afterValidate() {
+  
+  }
+  
+  async findExisting(email) {
+    const existing = await User.findOne({ email ))
+    return !existing
+  }
+  
+  async isBlacklisted(email) {
+    ...
+  }
 }
 ````
 
