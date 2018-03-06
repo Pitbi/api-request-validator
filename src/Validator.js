@@ -10,6 +10,7 @@ class Validator {
         this.error = null
         this.warnings = {}
         this.fallbacks = {}
+        this.options = {}
     }
 
     async run () {
@@ -43,6 +44,8 @@ class Validator {
         this.checkRegexp(validation, data)
         this.checkEnum(validation, data)
         await this.checkAsyncMethods(validation, data)
+        if (!this.options.disableReplaceFallbacks)
+            this.replaceDataByFallbacks()
     }
 
     /*If the required option is true in validation, we check if data is not undefined*/
@@ -116,6 +119,14 @@ class Validator {
                 this.throw(validation, 'asyncMethods', { error: method.error })
                 break
             }
+        }
+    }
+
+    /*Fallbacks management*/
+
+    replaceDataByFallbacks() {
+        for (const i in this.fallbacks) {
+            this.data[i] = this.fallbacks[i]
         }
     }
 

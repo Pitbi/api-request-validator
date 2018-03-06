@@ -47,6 +47,7 @@ var Validator = function () {
         this.error = null;
         this.warnings = {};
         this.fallbacks = {};
+        this.options = {};
     }
 
     (0, _createClass3.default)(Validator, [{
@@ -202,6 +203,9 @@ var Validator = function () {
                                 return this.checkAsyncMethods(validation, data);
 
                             case 6:
+                                if (!this.options.disableReplaceFallbacks) this.replaceDataByFallbacks();
+
+                            case 7:
                             case 'end':
                                 return _context5.stop();
                         }
@@ -375,6 +379,16 @@ var Validator = function () {
 
             return checkAsyncMethods;
         }()
+
+        /*Fallbacks management*/
+
+    }, {
+        key: 'replaceDataByFallbacks',
+        value: function replaceDataByFallbacks() {
+            for (var i in this.fallbacks) {
+                this.data[i] = this.fallbacks[i];
+            }
+        }
 
         /*****ERROR AND WARNING*****/
 
