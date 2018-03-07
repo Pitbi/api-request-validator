@@ -8,7 +8,7 @@ class Validator {
         //Default values
         this.isValid = true
         this.error = null
-        this.warnings = {}
+        this.warnings = []
         this.fallbacks = {}
         this.options = {}
     }
@@ -53,15 +53,10 @@ class Validator {
         if (!validation.required)
             return
 
-        if (validation.dependent && 
-            validation.dependentValue && 
-            this.data[validation.dependent] && 
-            this.data[validation.dependent] === validation.dependentValue &&
-            data === undefined
-        )
+        const haveDependence = this.haveDependence(validation.required)
+        if (!haveDependence && data === undefined)
             return this.throw(validation, 'required')
-
-        if (!validation.dependent && validation.required && data === undefined)
+        else if (haveDependence && this.isDependent(validation.required) && data === undefined)
             return this.throw(validation, 'required')
     }
 
@@ -80,9 +75,11 @@ class Validator {
     }
 
     checkType(validation, data) {
-        if (!validation.type || !data)
-            return
-        const type = validation.type.data
+        if (!validation.type || !validation.type.data || !data)
+            return false
+        const type = validation.type.data.toLowerCase()
+        if (type === 'date')
+            console.log(data, _.isDate(data))
         const switchType = (type) => {
             switch(type) {
 
@@ -99,6 +96,9 @@ class Validator {
             case 'boolean':
                 return _.isBoolean(data)
 
+            case 'date':
+                return _.isDate(new Date(data))
+
             default: return true
 
             }
@@ -107,6 +107,27 @@ class Validator {
         const isValid = switchType(type)
         if (!isValid) 
             this.throw(validation, 'type', { validationInfo: `The ${validation.key} attribute must be a ${type}` })
+    }
+
+    haveDependence(validation) {
+        if (!validation.dependent || (!validation.dependentValue && !validation.dependentValues))
+            return false
+        return true
+    }
+
+    isDependent(validation, data) {
+        if (!this.haveDependence(validation))
+            return false
+
+        const dependentValues = validation.dependentValues || [validation.dependentValue]
+        let dependent = false
+
+        dependentValues.forEach(attribute => {
+            if (this.data[validation.dependent] === attribute)
+                dependent = true
+        })
+        
+        return dependent
     }
 
     async checkAsyncMethods(validation, data) {
@@ -154,7 +175,7 @@ class Validator {
 
     /*Throw warning*/
     throwWarning(validation, validationRule, options = {}) {
-        this.warnings[validation[validationRule].warning.message] = validation[validationRule].warning.info || ''
+        this.warnings.push(validation[validationRule].warning)
         const fallback = validation[validationRule].fallback || validation.fallback
         if (fallback)
             this.fallbacks[validation.key] = fallback
