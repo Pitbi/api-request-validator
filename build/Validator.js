@@ -250,7 +250,7 @@ var Validator = function () {
         value: function checkType(validation, data) {
             if (!validation.type || !validation.type.data || !data) return false;
             var type = validation.type.data.toLowerCase();
-            if (type === 'date') console.log(data, _.isDate(data));
+
             var switchType = function switchType(type) {
                 switch (type) {
 
@@ -268,7 +268,7 @@ var Validator = function () {
                         return _.isBoolean(data);
 
                     case 'date':
-                        return _.isDate(new Date(data));
+                        return !isNaN(new Date(data).getTime());
 
                     default:
                         return true;
