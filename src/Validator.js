@@ -78,8 +78,7 @@ class Validator {
         if (!validation.type || !validation.type.data || !data)
             return false
         const type = validation.type.data.toLowerCase()
-        if (type === 'date')
-            console.log(data, _.isDate(data))
+        
         const switchType = (type) => {
             switch(type) {
 
@@ -97,7 +96,7 @@ class Validator {
                 return _.isBoolean(data)
 
             case 'date':
-                return _.isDate(new Date(data))
+                return !isNaN(new Date(data).getTime())
 
             default: return true
 

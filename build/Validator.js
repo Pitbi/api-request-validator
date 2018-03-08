@@ -45,7 +45,7 @@ var Validator = function () {
         //Default values
         this.isValid = true;
         this.error = null;
-        this.warnings = {};
+        this.warnings = [];
         this.fallbacks = {};
         this.options = {};
     }
@@ -227,9 +227,8 @@ var Validator = function () {
         value: function checkRequired(validation, data) {
             if (!validation.required) return;
 
-            if (validation.dependent && validation.dependentValue && this.data[validation.dependent] && this.data[validation.dependent] === validation.dependentValue && data === undefined) return this.throw(validation, 'required');
-
-            if (!validation.dependent && validation.required && data === undefined) return this.throw(validation, 'required');
+            var haveDependence = this.haveDependence(validation.required);
+            if (!haveDependence && data === undefined) return this.throw(validation, 'required');else if (haveDependence && this.isDependent(validation.required) && data === undefined) return this.throw(validation, 'required');
         }
 
         /*Check if value is in enum*/
@@ -249,8 +248,9 @@ var Validator = function () {
     }, {
         key: 'checkType',
         value: function checkType(validation, data) {
-            if (!validation.type || !data) return;
-            var type = validation.type.data;
+            if (!validation.type || !validation.type.data || !data) return false;
+            var type = validation.type.data.toLowerCase();
+            if (type === 'date') console.log(data, _.isDate(data));
             var switchType = function switchType(type) {
                 switch (type) {
 
@@ -267,6 +267,9 @@ var Validator = function () {
                     case 'boolean':
                         return _.isBoolean(data);
 
+                    case 'date':
+                        return _.isDate(new Date(data));
+
                     default:
                         return true;
 
@@ -277,10 +280,32 @@ var Validator = function () {
             if (!isValid) this.throw(validation, 'type', { validationInfo: 'The ' + validation.key + ' attribute must be a ' + type });
         }
     }, {
+        key: 'haveDependence',
+        value: function haveDependence(validation) {
+            if (!validation.dependent || !validation.dependentValue && !validation.dependentValues) return false;
+            return true;
+        }
+    }, {
+        key: 'isDependent',
+        value: function isDependent(validation, data) {
+            var _this = this;
+
+            if (!this.haveDependence(validation)) return false;
+
+            var dependentValues = validation.dependentValues || [validation.dependentValue];
+            var dependent = false;
+
+            dependentValues.forEach(function (attribute) {
+                if (_this.data[validation.dependent] === attribute) dependent = true;
+            });
+
+            return dependent;
+        }
+    }, {
         key: 'checkAsyncMethods',
         value: function () {
             var _ref6 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee6(validation, data) {
-                var _this = this;
+                var _this2 = this;
 
                 var methods, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, method, valid;
 
@@ -297,7 +322,7 @@ var Validator = function () {
 
                             case 2:
                                 methods = validation.asyncMethods.filter(function (method) {
-                                    return _this[method.data];
+                                    return _this2[method.data];
                                 });
                                 _iteratorNormalCompletion = true;
                                 _didIteratorError = false;
@@ -427,7 +452,7 @@ var Validator = function () {
         value: function throwWarning(validation, validationRule) {
             var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-            this.warnings[validation[validationRule].warning.message] = validation[validationRule].warning.info || '';
+            this.warnings.push(validation[validationRule].warning);
             var fallback = validation[validationRule].fallback || validation.fallback;
             if (fallback) this.fallbacks[validation.key] = fallback;
         }
