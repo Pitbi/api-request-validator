@@ -33,7 +33,7 @@ class Validator {
         const { validations, data } = this
         for (const key in validations) {
             if (this.isValid)
-                await this.validate({ ...validations[key], key }, _.get(key))
+                await this.validate({ ...validations[key], key }, _.get(data, key))
         }
     }
 
