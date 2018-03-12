@@ -164,7 +164,7 @@ var Validator = function () {
                                 }
 
                                 _context4.next = 7;
-                                return this.validate((0, _extends3.default)({}, validations[key], { key: key }), _.get(key));
+                                return this.validate((0, _extends3.default)({}, validations[key], { key: key }), _.get(data, key));
 
                             case 7:
                                 _context4.next = 2;
