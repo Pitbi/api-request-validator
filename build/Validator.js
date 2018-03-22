@@ -241,7 +241,7 @@ var Validator = function () {
     }, {
         key: 'checkRegexp',
         value: function checkRegexp(validation, data) {
-            if (!validation.regexp || !validation.regexp.data || !this.isValid) return;
+            if (!validation.regexp || !validation.regexp.data || !this.isValid || !data) return;
 
             if (!validation.regexp.data.exec(data)) this.throw(validation, 'regexp', { validationInfo: 'Regexp: ' + validation.regexp.data });
         }
