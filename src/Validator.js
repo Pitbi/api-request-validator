@@ -67,7 +67,7 @@ class Validator {
     }
 
     checkRegexp(validation, data) {
-        if (!validation.regexp || !validation.regexp.data || !this.isValid)
+        if (!validation.regexp || !validation.regexp.data || !this.isValid || !data)
             return
 
         if (!validation.regexp.data.exec(data))
