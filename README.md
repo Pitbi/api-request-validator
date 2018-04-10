@@ -1,6 +1,6 @@
 # api-request-validator
 
-This module is under construction
+**This module is under construction**
 
 A library to validate API requests attributes
 
@@ -14,13 +14,25 @@ A library to validate API requests attributes
 
 #### Rules
 
-**TO DO: List & descriptions of each validation rules**
+|  Rule           |      Description              | Valid condition                   |
+|-----------------|:-----------------------------:|----------------------------------:|
+| required        | value is required             | `value !== undefined`             |
+| enum            | value must be quel to         | `enum.indexOf(value !== -1)`      |
+| type            | tyming                        | `typeof(value) === type`          |
+| regexp          | regexp must be match value    | `regexp.exec(value)`              |
+| asyncMethods    | custom async functions        | `() => true`                      |
+
+**TO DO: Explain the difference between error and warning**
 
     const validationRules = {
       ['PAYLOAD_KEY']: {
         ['VALIDATION_RULE']: { 
           data: ...,
           error: { }
+        },
+        ['VALIDATION_RULE']: { 
+          data: ...,
+          warning: { }
         }
       }
     }
@@ -31,15 +43,21 @@ In our example, the accepted **payload** of the request is like this:
 
     {
       email: 'jon@world.com',
-      password: 'Monkey123'
+      password: 'Monkey123',
+      profile: 'full'
     }
 
-To validate the email attribute, we use followings rules:
+To validate the `email` attribute, we use followings rules:
 
 - required
 - type (string)
 - regexp
 - custom async methods
+
+To validate the `profile` attribute, we use followings rules:
+
+- required
+- enum
 
 #### Constructor
 
@@ -60,8 +78,28 @@ api-request-validator export a class constructor. The best way to build the vali
           error: LOGIN_ERROR_EMAIL_INVALID,
           data: /^([a-zA-Z0-9_\.\-\+])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,6})+$/
         },
-        methods: ['findExisting', 'isBlacklisted']
+        asyncMethods: [
+          {
+            data: 'findExisting',
+            error: LOGIN_ERROR_EMAIL_ALREADY_EXISTS
+          }, 
+          {
+            data: 'isBlacklisted',
+            error: LOGIN_ERROR_EMAIL_BLACKLISTED
+          }
+        ]
       },
+      profile: {
+        required: {
+          warning: LOGIN_WARNING_PROFILE_REQUIRED,
+          fallback: 'full'
+        },
+        enum: {
+          warning: LOGIN_WARNING_PROFILE_UNKNOWN,
+          data: ['full', 'limited', 'read'],
+          fallback: 'full'
+        }
+      }
       password: {
         ...
       }
@@ -90,7 +128,7 @@ api-request-validator export a class constructor. The best way to build the vali
       }
     }
 
-##### Examples of errors 
+##### Examples of errors and warnings
 
     /*Errors returned by validator if rules are not respected*/
     const LOGIN_ERROR_EMAIL_REQUIRED = {
@@ -102,11 +140,23 @@ api-request-validator export a class constructor. The best way to build the vali
     const LOGIN_ERROR_EMAIL__TYPE_ERROR = { ... }
     const LOGIN_WARNING_EMAIL__DANGEROUS = { ... }
 
+    /*Warnings returned by validator if rules are not respected*/
+    const LOGIN_WARNING_PROFILE_REQUIRED = {
+      message: 'login_warning_profile__required',
+      info: 'The profile setted is "full"' 
+    }
+
+    const LOGIN_WARNING_PROFILE_UNKNOWN = {
+      message: 'login_warning_profile__unknown',
+      info: 'The profile setted is "full"' 
+    }
+
+
 #### Validate express payload
 
     app.post('/login, async (req, res, next) => {
       const validator = new LoginValidator(req.body)
-      await valiadtor.run()
+      await validator.run()
       if (!validator.valid)
         return next(validator.error)
       if (validator.warnings)
@@ -117,6 +167,7 @@ api-request-validator export a class constructor. The best way to build the vali
 
 ## To do
 
+- refactor warnings
 - write correct documentation
 - tests
 - examples

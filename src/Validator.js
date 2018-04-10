@@ -8,8 +8,9 @@ class Validator {
         //Default values
         this.isValid = true
         this.error = null
-        this.warnings = {}
+        this.warnings = []
         this.fallbacks = {}
+        this.options = {}
     }
 
     async run () {
@@ -32,7 +33,7 @@ class Validator {
         const { validations, data } = this
         for (const key in validations) {
             if (this.isValid)
-                await this.validate({ ...validations[key], key }, data[key])
+                await this.validate({ ...validations[key], key }, _.get(data, key))
         }
     }
 
@@ -43,6 +44,8 @@ class Validator {
         this.checkRegexp(validation, data)
         this.checkEnum(validation, data)
         await this.checkAsyncMethods(validation, data)
+        if (!this.options.disableReplaceFallbacks)
+            this.replaceDataByFallbacks()
     }
 
     /*If the required option is true in validation, we check if data is not undefined*/
@@ -50,15 +53,10 @@ class Validator {
         if (!validation.required)
             return
 
-        if (validation.dependent && 
-            validation.dependentValue && 
-            this.data[validation.dependent] && 
-            this.data[validation.dependent] === validation.dependentValue &&
-            data === undefined
-        )
+        const haveDependence = this.haveDependence(validation.required)
+        if (!haveDependence && data === undefined)
             return this.throw(validation, 'required')
-
-        if (!validation.dependent && validation.required && data === undefined)
+        else if (haveDependence && this.isDependent(validation.required) && data === undefined)
             return this.throw(validation, 'required')
     }
 
@@ -69,7 +67,7 @@ class Validator {
     }
 
     checkRegexp(validation, data) {
-        if (!validation.regexp || !validation.regexp.data || !this.isValid)
+        if (!validation.regexp || !validation.regexp.data || !this.isValid || !data)
             return
 
         if (!validation.regexp.data.exec(data))
@@ -77,9 +75,10 @@ class Validator {
     }
 
     checkType(validation, data) {
-        if (!validation.type || !data)
-            return
-        const type = validation.type.data
+        if (!validation.type || !validation.type.data || !data)
+            return false
+        const type = validation.type.data.toLowerCase()
+        
         const switchType = (type) => {
             switch(type) {
 
@@ -96,6 +95,9 @@ class Validator {
             case 'boolean':
                 return _.isBoolean(data)
 
+            case 'date':
+                return !isNaN(new Date(data).getTime())
+
             default: return true
 
             }
@@ -106,16 +108,45 @@ class Validator {
             this.throw(validation, 'type', { validationInfo: `The ${validation.key} attribute must be a ${type}` })
     }
 
+    haveDependence(validation) {
+        if (!validation.dependent || (!validation.dependentValue && !validation.dependentValues))
+            return false
+        return true
+    }
+
+    isDependent(validation, data) {
+        if (!this.haveDependence(validation))
+            return false
+
+        const dependentValues = validation.dependentValues || [validation.dependentValue]
+        let dependent = false
+
+        dependentValues.forEach(attribute => {
+            if (this.data[validation.dependent] === attribute)
+                dependent = true
+        })
+        
+        return dependent
+    }
+
     async checkAsyncMethods(validation, data) {
-        if (!validation.asyncMethods)
+        if (!validation.asyncMethods || !data)
             return
         const methods = validation.asyncMethods.filter(method => this[method.data])
         for (let method of methods) {
-            const valid = await this[method.data](data)
+            const valid = await this[method.data](data, validation)
             if (!valid) {
                 this.throw(validation, 'asyncMethods', { error: method.error })
                 break
             }
+        }
+    }
+
+    /*Fallbacks management*/
+
+    replaceDataByFallbacks() {
+        for (const i in this.fallbacks) {
+            this.data[i] = this.fallbacks[i]
         }
     }
 
@@ -143,7 +174,7 @@ class Validator {
 
     /*Throw warning*/
     throwWarning(validation, validationRule, options = {}) {
-        this.warnings[validation[validationRule].warning.message] = validation[validationRule].warning.info || ''
+        this.warnings.push(validation[validationRule].warning)
         const fallback = validation[validationRule].fallback || validation.fallback
         if (fallback)
             this.fallbacks[validation.key] = fallback

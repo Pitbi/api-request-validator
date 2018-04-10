@@ -45,8 +45,9 @@ var Validator = function () {
         //Default values
         this.isValid = true;
         this.error = null;
-        this.warnings = {};
+        this.warnings = [];
         this.fallbacks = {};
+        this.options = {};
     }
 
     (0, _createClass3.default)(Validator, [{
@@ -163,7 +164,7 @@ var Validator = function () {
                                 }
 
                                 _context4.next = 7;
-                                return this.validate((0, _extends3.default)({}, validations[key], { key: key }), data[key]);
+                                return this.validate((0, _extends3.default)({}, validations[key], { key: key }), _.get(data, key));
 
                             case 7:
                                 _context4.next = 2;
@@ -202,6 +203,9 @@ var Validator = function () {
                                 return this.checkAsyncMethods(validation, data);
 
                             case 6:
+                                if (!this.options.disableReplaceFallbacks) this.replaceDataByFallbacks();
+
+                            case 7:
                             case 'end':
                                 return _context5.stop();
                         }
@@ -223,9 +227,8 @@ var Validator = function () {
         value: function checkRequired(validation, data) {
             if (!validation.required) return;
 
-            if (validation.dependent && validation.dependentValue && this.data[validation.dependent] && this.data[validation.dependent] === validation.dependentValue && data === undefined) return this.throw(validation, 'required');
-
-            if (!validation.dependent && validation.required && data === undefined) return this.throw(validation, 'required');
+            var haveDependence = this.haveDependence(validation.required);
+            if (!haveDependence && data === undefined) return this.throw(validation, 'required');else if (haveDependence && this.isDependent(validation.required) && data === undefined) return this.throw(validation, 'required');
         }
 
         /*Check if value is in enum*/
@@ -238,15 +241,16 @@ var Validator = function () {
     }, {
         key: 'checkRegexp',
         value: function checkRegexp(validation, data) {
-            if (!validation.regexp || !validation.regexp.data || !this.isValid) return;
+            if (!validation.regexp || !validation.regexp.data || !this.isValid || !data) return;
 
             if (!validation.regexp.data.exec(data)) this.throw(validation, 'regexp', { validationInfo: 'Regexp: ' + validation.regexp.data });
         }
     }, {
         key: 'checkType',
         value: function checkType(validation, data) {
-            if (!validation.type || !data) return;
-            var type = validation.type.data;
+            if (!validation.type || !validation.type.data || !data) return false;
+            var type = validation.type.data.toLowerCase();
+
             var switchType = function switchType(type) {
                 switch (type) {
 
@@ -263,6 +267,9 @@ var Validator = function () {
                     case 'boolean':
                         return _.isBoolean(data);
 
+                    case 'date':
+                        return !isNaN(new Date(data).getTime());
+
                     default:
                         return true;
 
@@ -273,10 +280,32 @@ var Validator = function () {
             if (!isValid) this.throw(validation, 'type', { validationInfo: 'The ' + validation.key + ' attribute must be a ' + type });
         }
     }, {
+        key: 'haveDependence',
+        value: function haveDependence(validation) {
+            if (!validation.dependent || !validation.dependentValue && !validation.dependentValues) return false;
+            return true;
+        }
+    }, {
+        key: 'isDependent',
+        value: function isDependent(validation, data) {
+            var _this = this;
+
+            if (!this.haveDependence(validation)) return false;
+
+            var dependentValues = validation.dependentValues || [validation.dependentValue];
+            var dependent = false;
+
+            dependentValues.forEach(function (attribute) {
+                if (_this.data[validation.dependent] === attribute) dependent = true;
+            });
+
+            return dependent;
+        }
+    }, {
         key: 'checkAsyncMethods',
         value: function () {
             var _ref6 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee6(validation, data) {
-                var _this = this;
+                var _this2 = this;
 
                 var methods, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, method, valid;
 
@@ -284,7 +313,7 @@ var Validator = function () {
                     while (1) {
                         switch (_context6.prev = _context6.next) {
                             case 0:
-                                if (validation.asyncMethods) {
+                                if (!(!validation.asyncMethods || !data)) {
                                     _context6.next = 2;
                                     break;
                                 }
@@ -293,7 +322,7 @@ var Validator = function () {
 
                             case 2:
                                 methods = validation.asyncMethods.filter(function (method) {
-                                    return _this[method.data];
+                                    return _this2[method.data];
                                 });
                                 _iteratorNormalCompletion = true;
                                 _didIteratorError = false;
@@ -309,7 +338,7 @@ var Validator = function () {
 
                                 method = _step.value;
                                 _context6.next = 12;
-                                return this[method.data](data);
+                                return this[method.data](data, validation);
 
                             case 12:
                                 valid = _context6.sent;
@@ -376,6 +405,16 @@ var Validator = function () {
             return checkAsyncMethods;
         }()
 
+        /*Fallbacks management*/
+
+    }, {
+        key: 'replaceDataByFallbacks',
+        value: function replaceDataByFallbacks() {
+            for (var i in this.fallbacks) {
+                this.data[i] = this.fallbacks[i];
+            }
+        }
+
         /*****ERROR AND WARNING*****/
 
         /*Throw warning or error*/
@@ -413,7 +452,7 @@ var Validator = function () {
         value: function throwWarning(validation, validationRule) {
             var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-            this.warnings[validation[validationRule].warning.message] = validation[validationRule].warning.info || '';
+            this.warnings.push(validation[validationRule].warning);
             var fallback = validation[validationRule].fallback || validation.fallback;
             if (fallback) this.fallbacks[validation.key] = fallback;
         }
