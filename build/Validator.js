@@ -313,7 +313,7 @@ var Validator = function () {
                     while (1) {
                         switch (_context6.prev = _context6.next) {
                             case 0:
-                                if (validation.asyncMethods) {
+                                if (!(!validation.asyncMethods || !data)) {
                                     _context6.next = 2;
                                     break;
                                 }
@@ -338,7 +338,7 @@ var Validator = function () {
 
                                 method = _step.value;
                                 _context6.next = 12;
-                                return this[method.data](data);
+                                return this[method.data](data, validation);
 
                             case 12:
                                 valid = _context6.sent;

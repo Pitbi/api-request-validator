@@ -71,7 +71,16 @@ api-request-validator export a class constructor. The best way to build the vali
           error: LOGIN_ERROR_EMAIL_INVALID,
           data: /^([a-zA-Z0-9_\.\-\+])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,6})+$/
         },
-        methods: ['findExisting', 'isBlacklisted']
+        asyncMethods: [
+          {
+            data: 'findExisting',
+            error: LOGIN_ERROR_EMAIL_ALREADY_EXISTS
+          }, 
+          {
+            data: 'isBlacklisted',
+            error: LOGIN_ERROR_EMAIL_BLACKLISTED
+          }
+        ]
       },
       profile: {
         required: {

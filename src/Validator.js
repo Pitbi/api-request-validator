@@ -130,11 +130,11 @@ class Validator {
     }
 
     async checkAsyncMethods(validation, data) {
-        if (!validation.asyncMethods)
+        if (!validation.asyncMethods || !data)
             return
         const methods = validation.asyncMethods.filter(method => this[method.data])
         for (let method of methods) {
-            const valid = await this[method.data](data)
+            const valid = await this[method.data](data, validation)
             if (!valid) {
                 this.throw(validation, 'asyncMethods', { error: method.error })
                 break
