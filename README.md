@@ -22,7 +22,7 @@ A library to validate API requests attributes
 |-----------------|-------------------------------|-----------------------------------|
 | required        | value is required             | `value !== undefined`             |
 | enum            | value must be quel to         | `enum.indexOf(value !== -1)`      |
-| type            | tyming                        | `typeof(value) === type`          |
+| type            | type of value                 | `typeof(value) === type`          |
 | regexp          | regexp must be match value    | `regexp.exec(value)`              |
 | asyncMethods    | custom async functions        | `() => true`                      |
 
