@@ -1,9 +1,5 @@
 'use strict';
 
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-
 var _getIterator2 = require('babel-runtime/core-js/get-iterator');
 
 var _getIterator3 = _interopRequireDefault(_getIterator2);
@@ -226,9 +222,7 @@ var Validator = function () {
         key: 'checkRequired',
         value: function checkRequired(validation, data) {
             if (!validation.required) return;
-
-            var haveDependence = this.haveDependence(validation.required);
-            if (!haveDependence && data === undefined) return this.throw(validation, 'required');else if (haveDependence && this.isDependent(validation.required) && data === undefined) return this.throw(validation, 'required');
+            if (!validation.required.conditions && data === undefined) return this.throw(validation, 'required');else if (this.checkConditions(validation.required.conditions) && data === undefined) return this.throw(validation, 'required');
         }
 
         /*Check if value is in enum*/
@@ -280,26 +274,22 @@ var Validator = function () {
             if (!isValid) this.throw(validation, 'type', { validationInfo: 'The ' + validation.key + ' attribute must be a ' + type });
         }
     }, {
-        key: 'haveDependence',
-        value: function haveDependence(validation) {
-            if (!validation.dependent || !validation.dependentValue && !validation.dependentValues) return false;
-            return true;
-        }
-    }, {
-        key: 'isDependent',
-        value: function isDependent(validation, data) {
+        key: 'checkConditions',
+        value: function checkConditions(conditions, data) {
             var _this = this;
 
-            if (!this.haveDependence(validation)) return false;
-
-            var dependentValues = validation.dependentValues || [validation.dependentValue];
-            var dependent = false;
-
-            dependentValues.forEach(function (attribute) {
-                if (_this.data[validation.dependent] === attribute) dependent = true;
+            if (!conditions) return false;
+            var result = false;
+            conditions.forEach(function (condition) {
+                if (condition.values) {
+                    condition.values.forEach(function (value) {
+                        if (_.get(_this.data, condition.key) === value) result = true;
+                    });
+                } else if (_.get(_this.data, condition.key)) {
+                    result = true;
+                }
             });
-
-            return dependent;
+            return result;
         }
     }, {
         key: 'checkAsyncMethods',
@@ -460,4 +450,4 @@ var Validator = function () {
     return Validator;
 }();
 
-exports.default = Validator;
+module.exports = Validator;

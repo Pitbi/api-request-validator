@@ -19,7 +19,7 @@ A library to validate API requests attributes
 #### Rules
 
 |  Rule           |      Description              | Valid condition                   |
-|-----------------|:-----------------------------:|----------------------------------:|
+|-----------------|-------------------------------|-----------------------------------|
 | required        | value is required             | `value !== undefined`             |
 | enum            | value must be quel to         | `enum.indexOf(value !== -1)`      |
 | type            | tyming                        | `typeof(value) === type`          |
@@ -41,75 +41,21 @@ A library to validate API requests attributes
       }
     }
 
-### Simple example: login request validation
+### Simple example: user registration request validation
 
-In our example, the accepted **payload** of the request is like this: 
+[See a the example here!](https://github.com/Pitbi/api-request-validator/blob/master/features/validators/UserRegistration.js)
 
-    {
-      email: 'jon@world.com',
-      password: 'Monkey123',
-      profile: 'full'
-    }
-
-To validate the `email` attribute, we use followings rules:
-
-- required
-- type (string)
-- regexp
-- custom async methods
-
-To validate the `profile` attribute, we use followings rules:
-
-- required
-- enum
+[Scenario of example](https://github.com/Pitbi/api-request-validator/blob/master/features/user_registration_validation.feature)
 
 #### Constructor
 
-api-request-validator export a class constructor. The best way to build the validator is to extend the Validator class and set `RULES` as first argument of `super()` in `constructor()`:
+api-request-validator export a class constructor. The best way to build the validator is to extend the Validator class and set `RULES` as first argument of `super()` in `constructor()`. This approach allows to pass methods to the validator, like this:
+
+
 
     import Validator from 'api-request-validator'
-
-    const RULES = {
-      email: {
-        required: {
-          error: LOGIN_ERROR_EMAIL_REQUIRED
-        },
-        type: {
-          error: LOGIN_ERROR_EMAIL__TYPE_ERROR,
-          data: 'string'
-        },
-        regexp: {
-          error: LOGIN_ERROR_EMAIL_INVALID,
-          data: /^([a-zA-Z0-9_\.\-\+])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,6})+$/
-        },
-        asyncMethods: [
-          {
-            data: 'findExisting',
-            error: LOGIN_ERROR_EMAIL_ALREADY_EXISTS
-          }, 
-          {
-            data: 'isBlacklisted',
-            error: LOGIN_ERROR_EMAIL_BLACKLISTED
-          }
-        ]
-      },
-      profile: {
-        required: {
-          warning: LOGIN_WARNING_PROFILE_REQUIRED,
-          fallback: 'full'
-        },
-        enum: {
-          warning: LOGIN_WARNING_PROFILE_UNKNOWN,
-          data: ['full', 'limited', 'read'],
-          fallback: 'full'
-        }
-      }
-      password: {
-        ...
-      }
-    }
       
-    class LoginValidator extends Validator {
+    class UserRegistrationValidator extends Validator {
       constructor(payload) {
         super(RULES, payload, {})
       }
@@ -132,31 +78,11 @@ api-request-validator export a class constructor. The best way to build the vali
       }
     }
 
-##### Examples of errors and warnings
+Or for simple case
 
-    /*Errors returned by validator if rules are not respected*/
-    const LOGIN_ERROR_EMAIL_REQUIRED = {
-      err: 'login_failure_email__required',
-      code: 422,
-      message: 'Please, enter your email.'
-    }
-    const LOGIN_ERROR_EMAIL_INVALID = { /*WHAT YOU WANT*/ }
-    const LOGIN_ERROR_EMAIL__TYPE_ERROR = { ... }
-    const LOGIN_WARNING_EMAIL__DANGEROUS = { ... }
+    const validator = new Validator(RULES, payload)
 
-    /*Warnings returned by validator if rules are not respected*/
-    const LOGIN_WARNING_PROFILE_REQUIRED = {
-      message: 'login_warning_profile__required',
-      info: 'The profile setted is "full"' 
-    }
-
-    const LOGIN_WARNING_PROFILE_UNKNOWN = {
-      message: 'login_warning_profile__unknown',
-      info: 'The profile setted is "full"' 
-    }
-
-
-#### Validate express payload
+#### Example with express
 
     app.post('/login, async (req, res, next) => {
       const validator = new LoginValidator(req.body)
@@ -171,8 +97,5 @@ api-request-validator export a class constructor. The best way to build the vali
 
 ## To do
 
-- refactor warnings
 - write correct documentation
-- tests
-- examples
 - imrove :)
