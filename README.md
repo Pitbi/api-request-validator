@@ -10,6 +10,10 @@ A library to validate API requests attributes
 
     $ npm install api-request-validator
 
+## Test
+
+    $ npm run test
+
 ## Usage
 
 #### Rules

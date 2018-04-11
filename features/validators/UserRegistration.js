@@ -1,4 +1,4 @@
-const Validator = require('../../build/Validator').default
+const Validator = require('../../src/Validator')
 
 const RULES = {
     email: {
@@ -55,6 +55,54 @@ const RULES = {
             error: {
                 code: 422,
                 err: 'user_registration_invalid_type_comment'
+            }
+        }
+    },
+    age: {
+        required: {
+            conditions: [{
+                key: 'gender',
+                values: ['male']
+            }],
+            error: {
+                code: 422,
+                err: 'user_registration_missing_age'
+            }
+        }
+    },
+    'location.lat': {
+        type: {
+            data: 'number',
+            error: {
+                code: 422,
+                err: 'user_registration_invalid_type_latitude'
+            }
+        },
+        required: {
+            conditions: [{
+                key: 'location.lng'
+            }],
+            error: {
+                code: 422,
+                err: 'user_registration_missing_latitude'
+            }
+        }
+    },
+    'location.lng': {
+        type: {
+            data: 'number',
+            error: {
+                code: 422,
+                err: 'user_registration_invalid_type_longitude'
+            }
+        },
+        required: {
+            conditions: [{
+                key: 'location.lat'
+            }],
+            error: {
+                code: 422,
+                err: 'user_registration_missing_longitude'
             }
         }
     }
