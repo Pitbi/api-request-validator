@@ -1,3 +1,3 @@
 # api-request-validator
 
-[Repository](https://github.com/Pitbi/api-request-validator){:target="_blank"}
+[Repository](https://github.com/Pitbi/api-request-validator)
