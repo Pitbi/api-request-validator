@@ -52,11 +52,9 @@ class Validator {
     checkRequired(validation, data) {
         if (!validation.required)
             return
-
-        const haveDependence = this.haveDependence(validation.required)
-        if (!haveDependence && data === undefined)
+        if (!validation.required.conditions && data === undefined)
             return this.throw(validation, 'required')
-        else if (haveDependence && this.isDependent(validation.required) && data === undefined)
+        else if (this.checkConditions(validation.required.conditions) && data === undefined)
             return this.throw(validation, 'required')
     }
 
@@ -107,26 +105,22 @@ class Validator {
         if (!isValid) 
             this.throw(validation, 'type', { validationInfo: `The ${validation.key} attribute must be a ${type}` })
     }
-
-    haveDependence(validation) {
-        if (!validation.dependent || (!validation.dependentValue && !validation.dependentValues))
+    
+    checkConditions(conditions, data) {
+        if (!conditions)
             return false
-        return true
-    }
-
-    isDependent(validation, data) {
-        if (!this.haveDependence(validation))
-            return false
-
-        const dependentValues = validation.dependentValues || [validation.dependentValue]
-        let dependent = false
-
-        dependentValues.forEach(attribute => {
-            if (this.data[validation.dependent] === attribute)
-                dependent = true
+        let result = false
+        conditions.forEach(condition => {
+            if (condition.values) {
+                condition.values.forEach(value => {
+                    if (_.get(this.data, condition.key) === value)
+                        result = true
+                })
+            } else if (_.get(this.data, condition.key)) {
+                result = true
+            }
         })
-        
-        return dependent
+        return result
     }
 
     async checkAsyncMethods(validation, data) {
@@ -181,4 +175,4 @@ class Validator {
     }
 }
 
-export default Validator
+module.exports = Validator
