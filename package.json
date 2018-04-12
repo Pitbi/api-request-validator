@@ -1,6 +1,6 @@
 {
   "name": "api-request-validator",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Validate API call parameters",
   "main": "index.js",
   "scripts": {
