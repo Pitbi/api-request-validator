@@ -41,11 +41,11 @@ A library to validate API requests attributes
       }
     }
 
-### Simple example: user registration request validation
+### Simple example: user registration payload validation
 
 [See the example here!](https://github.com/Pitbi/api-request-validator/blob/master/features/validators/UserRegistration.js)
 
-[Scenario of example](https://github.com/Pitbi/api-request-validator/blob/master/features/user_registration_validation.feature)
+[Scenarios of example](https://github.com/Pitbi/api-request-validator/blob/master/features/user_registration_validation.feature)
 
 #### Constructor
 
@@ -98,4 +98,4 @@ Or for simple case
 ## To do
 
 - write correct documentation
-- imrove :)
+- improve :)
