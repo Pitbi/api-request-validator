@@ -235,7 +235,7 @@ var Validator = function () {
     }, {
         key: 'checkRegexp',
         value: function checkRegexp(validation, data) {
-            if (!validation.regexp || !validation.regexp.data || !this.isValid || !data) return;
+            if (!validation.regexp || !validation.regexp.data || !data) return;
 
             if (!validation.regexp.data.exec(data)) this.throw(validation, 'regexp', { validationInfo: 'Regexp: ' + validation.regexp.data });
         }
@@ -425,6 +425,7 @@ var Validator = function () {
         value: function throwError(validation, validationRule) {
             var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
+            if (!this.isValid) return;
             this.isValid = false;
 
             if (validation[validationRule].error) {
