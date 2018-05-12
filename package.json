@@ -2,11 +2,11 @@
   "name": "api-request-validator",
   "version": "1.0.6",
   "description": "Validate API call parameters",
-  "main": "index.js",
+  "main": "./build/Validator.js",
   "scripts": {
     "test": "./node_modules/.bin/cucumber-js",
     "build": "rm -rf build && ./node_modules/.bin/babel src --presets babel-preset-es2015 --out-dir build",
-    "commit": "commit-wizard"
+    "prepublish": "npm run build"
   },
   "repository": {
     "type": "git",
