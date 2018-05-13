@@ -318,7 +318,7 @@ var Validator = function () {
 
                             case 8:
                                 if (_iteratorNormalCompletion = (_step = _iterator.next()).done) {
-                                    _context6.next = 25;
+                                    _context6.next = 23;
                                     break;
                                 }
 
@@ -330,69 +330,63 @@ var Validator = function () {
                             case 13:
                                 valid = _context6.sent;
 
-                                if (valid) {
-                                    _context6.next = 17;
-                                    break;
+                                if (!valid) {
+                                    this.throw(validation, 'asyncMethods', { error: method.error });
                                 }
-
-                                this.throw(validation, 'asyncMethods', { error: method.error });
-                                return _context6.abrupt('break', 25);
-
-                            case 17:
-                                _context6.next = 22;
+                                _context6.next = 20;
                                 break;
 
-                            case 19:
-                                _context6.prev = 19;
+                            case 17:
+                                _context6.prev = 17;
                                 _context6.t0 = _context6['catch'](10);
 
                                 this.asyncMethodsErrors.push(_context6.t0);
 
-                            case 22:
+                            case 20:
                                 _iteratorNormalCompletion = true;
                                 _context6.next = 8;
                                 break;
 
-                            case 25:
-                                _context6.next = 31;
+                            case 23:
+                                _context6.next = 29;
                                 break;
 
-                            case 27:
-                                _context6.prev = 27;
+                            case 25:
+                                _context6.prev = 25;
                                 _context6.t1 = _context6['catch'](6);
                                 _didIteratorError = true;
                                 _iteratorError = _context6.t1;
 
-                            case 31:
-                                _context6.prev = 31;
-                                _context6.prev = 32;
+                            case 29:
+                                _context6.prev = 29;
+                                _context6.prev = 30;
 
                                 if (!_iteratorNormalCompletion && _iterator.return) {
                                     _iterator.return();
                                 }
 
-                            case 34:
-                                _context6.prev = 34;
+                            case 32:
+                                _context6.prev = 32;
 
                                 if (!_didIteratorError) {
-                                    _context6.next = 37;
+                                    _context6.next = 35;
                                     break;
                                 }
 
                                 throw _iteratorError;
 
+                            case 35:
+                                return _context6.finish(32);
+
+                            case 36:
+                                return _context6.finish(29);
+
                             case 37:
-                                return _context6.finish(34);
-
-                            case 38:
-                                return _context6.finish(31);
-
-                            case 39:
                             case 'end':
                                 return _context6.stop();
                         }
                     }
-                }, _callee6, this, [[6, 27, 31, 39], [10, 19], [32,, 34, 38]]);
+                }, _callee6, this, [[6, 25, 29, 37], [10, 17], [30,, 32, 36]]);
             }));
 
             function checkAsyncMethods(_x6, _x7) {
@@ -432,13 +426,12 @@ var Validator = function () {
         value: function throwError(validation, validationRule) {
             var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-            if (validation[validationRule].error) {
-                if (!validation[validationRule].error.validationInfo && options.validationInfo) validation[validationRule].error.validationInfo = options.validationInfo;
-                if (this.isValid) this.error = validation[validationRule].error;
+            var error = options.error || validation[validationRule].error;
+            if (error) {
+                if (!error.validationInfo && options.validationInfo) error.validationInfo = options.validationInfo;
+                if (this.isValid) this.error = error;
                 if (!_.get(this.errors, validation.key)) _.set(this.errors, validation.key, []);
-                _.get(this.errors, validation.key).push(validation[validationRule].error);
-            } else if (options.error && this.isValid) {
-                this.error = options.error;
+                _.get(this.errors, validation.key).push(error);
             }
             this.isValid = false;
         }

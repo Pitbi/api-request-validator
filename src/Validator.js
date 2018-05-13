@@ -133,7 +133,6 @@ class Validator {
                 const valid = await this[method.data](data, validation)
                 if (!valid) {
                     this.throw(validation, 'asyncMethods', { error: method.error })
-                    break
                 }
             } catch (err) {
                 this.asyncMethodsErrors.push(err)
@@ -160,16 +159,15 @@ class Validator {
 
     /*Throw error*/
     throwError(validation, validationRule, options = {}) {
-        if (validation[validationRule].error) {
-            if (!validation[validationRule].error.validationInfo && options.validationInfo)
-                validation[validationRule].error.validationInfo = options.validationInfo
+        const error = options.error || validation[validationRule].error
+        if (error) {
+            if (!error.validationInfo && options.validationInfo)
+                error.validationInfo = options.validationInfo
             if (this.isValid)
-                this.error = validation[validationRule].error
+                this.error = error
             if (!_.get(this.errors, validation.key))
                 _.set(this.errors, validation.key, [])
-            _.get(this.errors, validation.key).push(validation[validationRule].error)
-        } else if (options.error && this.isValid) {
-            this.error = options.error
+            _.get(this.errors, validation.key).push(error)
         }
         this.isValid = false
     }
