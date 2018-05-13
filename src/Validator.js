@@ -8,6 +8,8 @@ class Validator {
         //Default values
         this.isValid = true
         this.error = null
+        this.errors = {}
+        this.asyncMethodsErrors = []
         this.warnings = []
         this.fallbacks = {}
         this.options = {}
@@ -32,8 +34,7 @@ class Validator {
     async makeValidations() {
         const { validations, data } = this
         for (const key in validations) {
-            if (this.isValid)
-                await this.validate({ ...validations[key], key }, _.get(data, key))
+            await this.validate({ ...validations[key], key }, _.get(data, key))
         }
     }
 
@@ -128,10 +129,14 @@ class Validator {
             return
         const methods = validation.asyncMethods.filter(method => this[method.data])
         for (let method of methods) {
-            const valid = await this[method.data](data, validation)
-            if (!valid) {
-                this.throw(validation, 'asyncMethods', { error: method.error })
-                break
+            try {
+                const valid = await this[method.data](data, validation)
+                if (!valid) {
+                    this.throw(validation, 'asyncMethods', { error: method.error })
+                    break
+                }
+            } catch (err) {
+                this.asyncMethodsErrors.push(err)
             }
         }
     }
@@ -155,17 +160,18 @@ class Validator {
 
     /*Throw error*/
     throwError(validation, validationRule, options = {}) {
-        if (!this.isValid)
-            return
-        this.isValid = false
-
         if (validation[validationRule].error) {
             if (!validation[validationRule].error.validationInfo && options.validationInfo)
                 validation[validationRule].error.validationInfo = options.validationInfo
-            this.error = validation[validationRule].error
-        } else if (options.error) {
+            if (this.isValid)
+                this.error = validation[validationRule].error
+            if (!_.get(this.errors, validation.key))
+                _.set(this.errors, validation.key, [])
+            _.get(this.errors, validation.key).push(validation[validationRule].error)
+        } else if (options.error && this.isValid) {
             this.error = options.error
         }
+        this.isValid = false
     }
 
     /*Throw warning*/

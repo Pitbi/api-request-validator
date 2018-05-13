@@ -2,6 +2,13 @@ const Validator = require('../../src/Validator')
 
 const RULES = {
     email: {
+        type: {
+            data: 'string',
+            error: {
+                code: 422,
+                err: 'user_registration_invalid_type_email'
+            }
+        },
         required: {
             error: {
                 code: 422,

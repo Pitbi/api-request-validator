@@ -119,3 +119,14 @@ Feature: User registration validation
         When I submit the user registration form
         Then the form is invalid
         Then I receive the error user_registration_missing_longitude
+    
+    @user_registration_invalid_multiple_errors
+    Scenario: User registration: invalid invalid email
+        Given I'am a visitor of the application
+        When I complete the user registration form
+        When I write an invalid email type
+        When I forgot the age field
+        When I forgot the latitude field of location
+        When I submit the user registration form
+        Then the form is invalid
+        Then I receive the several errors

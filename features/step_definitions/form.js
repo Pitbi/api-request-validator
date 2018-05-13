@@ -36,6 +36,10 @@ When('I write an invalid comment type', async function () {
     this.payload.comment = { message: 'yo!' }
 })
 
+When('I write an invalid email type', async function () {
+    this.payload.email = { message: 'yo!' }
+})
+
 When('I write an invalid latitude type', async function () {
     this.payload.location = { ...this.payload.location, lat: 'missing_latitude' }
 })
@@ -50,4 +54,8 @@ Then('the form is invalid', async function () {
 
 Then(/^I receive the error (.*)$/, async function (error) {
     expect(this.validator.error.err).to.be.equal(error)
+})
+
+Then('I receive the several errors', async function () {
+    expect(Object.keys(this.validator.errors).length).to.be.at.least(2)
 })
