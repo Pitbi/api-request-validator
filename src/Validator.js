@@ -12,11 +12,12 @@ class Validator {
         this.asyncMethodsErrors = []
         this.warnings = []
         this.fallbacks = {}
-        this.options = {}
+        this.options = options
     }
 
     async run () {
         await this.beforeValidate()
+        this.filterPayload()
         await this.makeValidations()
         await this.afterValidate()
     }
@@ -27,6 +28,17 @@ class Validator {
     }
     async afterValidate() {
         return true
+    }
+
+    /*Filter payload*/
+    filterPayload() {
+        if (!this.options.filter)
+            return
+        const keys = Object.keys(this.validations)
+        for (const key in this.data) {
+            if (!keys.includes(key))
+                delete this.data[key]
+        }
     }
 
     /*****VALIDATIONS*****/
@@ -62,7 +74,7 @@ class Validator {
     /*Check if value is in enum*/
     checkEnum(validation, data) {
         if (validation.enum && data && validation.enum.data.indexOf(data) === -1)
-            this.throw(validation, 'enum', { validationInfo: `The value must be: ${validation.enum.data}` })
+            this.throw(validation, 'enum', { validationInfo: `Value must be: ${validation.enum.data}` })
     }
 
     checkRegexp(validation, data) {
@@ -104,7 +116,7 @@ class Validator {
         
         const isValid = switchType(type)
         if (!isValid) 
-            this.throw(validation, 'type', { validationInfo: `The ${validation.key} attribute must be a ${type}` })
+            this.throw(validation, 'type', { validationInfo: `${validation.key} attribute must be a ${type}` })
     }
     
     checkConditions(conditions, data) {
@@ -161,10 +173,10 @@ class Validator {
     throwError(validation, validationRule, options = {}) {
         const error = options.error || validation[validationRule].error
         if (error) {
-            if (!error.validationInfo && options.validationInfo)
-                error.validationInfo = options.validationInfo
+            if (!error.validationInfo && options.validationInfo && !error.info)
+                error.info = options.validationInfo
             if (this.isValid)
-                this.error = error
+                this.error = this.options.mainError || error
             if (!_.get(this.errors, validation.key))
                 _.set(this.errors, validation.key, [])
             _.get(this.errors, validation.key).push(error)

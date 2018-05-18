@@ -8,6 +8,10 @@ var _extends2 = require('babel-runtime/helpers/extends');
 
 var _extends3 = _interopRequireDefault(_extends2);
 
+var _keys = require('babel-runtime/core-js/object/keys');
+
+var _keys2 = _interopRequireDefault(_keys);
+
 var _regenerator = require('babel-runtime/regenerator');
 
 var _regenerator2 = _interopRequireDefault(_regenerator);
@@ -45,7 +49,7 @@ var Validator = function () {
         this.asyncMethodsErrors = [];
         this.warnings = [];
         this.fallbacks = {};
-        this.options = {};
+        this.options = options;
     }
 
     (0, _createClass3.default)(Validator, [{
@@ -60,14 +64,15 @@ var Validator = function () {
                                 return this.beforeValidate();
 
                             case 2:
-                                _context.next = 4;
+                                this.filterPayload();
+                                _context.next = 5;
                                 return this.makeValidations();
 
-                            case 4:
-                                _context.next = 6;
+                            case 5:
+                                _context.next = 7;
                                 return this.afterValidate();
 
-                            case 6:
+                            case 7:
                             case 'end':
                                 return _context.stop();
                         }
@@ -132,6 +137,18 @@ var Validator = function () {
 
             return afterValidate;
         }()
+
+        /*Filter payload*/
+
+    }, {
+        key: 'filterPayload',
+        value: function filterPayload() {
+            if (!this.options.filter) return;
+            var keys = (0, _keys2.default)(this.validations);
+            for (var key in this.data) {
+                if (!keys.includes(key)) delete this.data[key];
+            }
+        }
 
         /*****VALIDATIONS*****/
         /*Make validation: make all vadations*/
@@ -226,7 +243,7 @@ var Validator = function () {
     }, {
         key: 'checkEnum',
         value: function checkEnum(validation, data) {
-            if (validation.enum && data && validation.enum.data.indexOf(data) === -1) this.throw(validation, 'enum', { validationInfo: 'The value must be: ' + validation.enum.data });
+            if (validation.enum && data && validation.enum.data.indexOf(data) === -1) this.throw(validation, 'enum', { validationInfo: 'Value must be: ' + validation.enum.data });
         }
     }, {
         key: 'checkRegexp',
@@ -267,7 +284,7 @@ var Validator = function () {
             };
 
             var isValid = switchType(type);
-            if (!isValid) this.throw(validation, 'type', { validationInfo: 'The ' + validation.key + ' attribute must be a ' + type });
+            if (!isValid) this.throw(validation, 'type', { validationInfo: validation.key + ' attribute must be a ' + type });
         }
     }, {
         key: 'checkConditions',
@@ -428,8 +445,8 @@ var Validator = function () {
 
             var error = options.error || validation[validationRule].error;
             if (error) {
-                if (!error.validationInfo && options.validationInfo) error.validationInfo = options.validationInfo;
-                if (this.isValid) this.error = error;
+                if (!error.validationInfo && options.validationInfo && !error.info) error.info = options.validationInfo;
+                if (this.isValid) this.error = this.options.mainError || error;
                 if (!_.get(this.errors, validation.key)) _.set(this.errors, validation.key, []);
                 _.get(this.errors, validation.key).push(error);
             }
