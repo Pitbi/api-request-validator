@@ -61,7 +61,7 @@ var Validator = function () {
                         switch (_context.prev = _context.next) {
                             case 0:
                                 _context.next = 2;
-                                return this.beforeValidate();
+                                return this.beforeValidate(this.data);
 
                             case 2:
                                 this.filterPayload();
@@ -70,7 +70,7 @@ var Validator = function () {
 
                             case 5:
                                 _context.next = 7;
-                                return this.afterValidate();
+                                return this.afterValidate(this.data);
 
                             case 7:
                             case 'end':
@@ -145,6 +145,7 @@ var Validator = function () {
         value: function filterPayload() {
             if (!this.options.filter) return;
             var keys = (0, _keys2.default)(this.validations);
+            if (this.options.acceptedFilterKeys) keys = keys.concat(this.options.acceptedFilterKeys);
             for (var key in this.data) {
                 if (!keys.includes(key)) delete this.data[key];
             }

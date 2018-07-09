@@ -16,10 +16,10 @@ class Validator {
     }
 
     async run () {
-        await this.beforeValidate()
+        await this.beforeValidate(this.data)
         this.filterPayload()
         await this.makeValidations()
-        await this.afterValidate()
+        await this.afterValidate(this.data)
     }
 
     /***Hooks***/
@@ -34,7 +34,9 @@ class Validator {
     filterPayload() {
         if (!this.options.filter)
             return
-        const keys = Object.keys(this.validations)
+        let keys = Object.keys(this.validations)
+        if (this.options.acceptedFilterKeys)
+            keys = keys.concat(this.options.acceptedFilterKeys)
         for (const key in this.data) {
             if (!keys.includes(key))
                 delete this.data[key]
