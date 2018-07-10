@@ -349,7 +349,7 @@ var Validator = function () {
                                 valid = _context6.sent;
 
                                 if (!valid) {
-                                    this.throw(validation, 'asyncMethods', { error: method.error });
+                                    this.throw(validation, 'asyncMethods', method);
                                 }
                                 _context6.next = 20;
                                 break;
