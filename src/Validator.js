@@ -146,7 +146,12 @@ class Validator {
             try {
                 const valid = await this[method.data](data, validation)
                 if (!valid) {
-                    this.throw(validation, 'asyncMethods', method)
+                    const options = {}
+                    if (method.error)
+                        options.error = method.error
+                    else if (method.warning)
+                        options.warning = method.warning
+                    this.throw(validation, 'asyncMethods', options)
                 }
             } catch (err) {
                 this.asyncMethodsErrors.push(err)
@@ -155,7 +160,6 @@ class Validator {
     }
 
     /*Fallbacks management*/
-
     replaceDataByFallbacks() {
         for (const i in this.fallbacks) {
             this.data[i] = this.fallbacks[i]
@@ -166,7 +170,7 @@ class Validator {
     
     /*Throw warning or error*/
     throw(validation, validationRule, options = {}) {
-        if (validation[validationRule].warning)
+        if (validation[validationRule].warning || options.warning)
             return this.throwWarning(validation, validationRule, options)
         this.throwError(validation, validationRule, options)
     }
@@ -188,7 +192,8 @@ class Validator {
 
     /*Throw warning*/
     throwWarning(validation, validationRule, options = {}) {
-        this.warnings.push(validation[validationRule].warning)
+        const warning = options.warning || validation[validationRule].warning
+        this.warnings.push(warning)
         const fallback = validation[validationRule].fallback || validation.fallback
         if (fallback)
             this.fallbacks[validation.key] = fallback

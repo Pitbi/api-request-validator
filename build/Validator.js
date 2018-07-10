@@ -311,7 +311,7 @@ var Validator = function () {
             var _ref6 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee6(validation, data) {
                 var _this2 = this;
 
-                var methods, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, method, valid;
+                var methods, _iteratorNormalCompletion, _didIteratorError, _iteratorError, _iterator, _step, method, valid, options;
 
                 return _regenerator2.default.wrap(function _callee6$(_context6) {
                     while (1) {
@@ -349,7 +349,10 @@ var Validator = function () {
                                 valid = _context6.sent;
 
                                 if (!valid) {
-                                    this.throw(validation, 'asyncMethods', method);
+                                    options = {};
+
+                                    if (method.error) options.error = method.error;else if (method.warning) options.warning = method.warning;
+                                    this.throw(validation, 'asyncMethods', options);
                                 }
                                 _context6.next = 20;
                                 break;
@@ -433,7 +436,7 @@ var Validator = function () {
         value: function _throw(validation, validationRule) {
             var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-            if (validation[validationRule].warning) return this.throwWarning(validation, validationRule, options);
+            if (validation[validationRule].warning || options.warning) return this.throwWarning(validation, validationRule, options);
             this.throwError(validation, validationRule, options);
         }
 
@@ -461,7 +464,8 @@ var Validator = function () {
         value: function throwWarning(validation, validationRule) {
             var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
 
-            this.warnings.push(validation[validationRule].warning);
+            var warning = options.warning || validation[validationRule].warning;
+            this.warnings.push(warning);
             var fallback = validation[validationRule].fallback || validation.fallback;
             if (fallback) this.fallbacks[validation.key] = fallback;
         }

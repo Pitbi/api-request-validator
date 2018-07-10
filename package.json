@@ -2,7 +2,7 @@
   "name": "api-request-validator",
   "version": "1.0.15",
   "description": "Validate API call parameters",
-  "main": "./build/Validator.js",
+  "main": "./index.js",
   "scripts": {
     "test": "./node_modules/.bin/cucumber-js",
     "build": "rm -rf build && ./node_modules/.bin/babel src --presets es2015,stage-0 --out-dir build",
