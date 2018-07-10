@@ -146,7 +146,7 @@ class Validator {
             try {
                 const valid = await this[method.data](data, validation)
                 if (!valid) {
-                    this.throw(validation, 'asyncMethods', { error: method.error })
+                    this.throw(validation, 'asyncMethods', method)
                 }
             } catch (err) {
                 this.asyncMethodsErrors.push(err)
