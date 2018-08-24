@@ -467,7 +467,7 @@ var Validator = function () {
             var warning = options.warning || validation[validationRule].warning;
             this.warnings.push(warning);
             var fallback = validation[validationRule].fallback || validation.fallback;
-            if (fallback) this.fallbacks[validation.key] = fallback;
+            if (fallback) _.set(this.fallbacks, validation.key, fallback);
         }
     }]);
     return Validator;
