@@ -196,7 +196,7 @@ class Validator {
         this.warnings.push(warning)
         const fallback = validation[validationRule].fallback || validation.fallback
         if (fallback)
-            this.fallbacks[validation.key] = fallback
+            _.set(this.fallbacks, validation.key, fallback)
     }
 }
 
