@@ -101,6 +101,9 @@ class Validator {
 
             case 'string':
                 return typeof(data) === 'string'
+            
+            case 'array':
+                return _.isArray(data)
 
             case 'object':
                 return _.isObject(data)
