@@ -299,10 +299,16 @@ var Validator = function () {
             var result = false;
             conditions.forEach(function (condition) {
                 if (condition.values) {
-                    condition.values.forEach(function (value) {
-                        if (_.get(_this.data, condition.key) === value) result = true;
-                    });
-                } else if (_.get(_this.data, condition.key)) {
+                    if (!_.get(_this.data, condition.key)) {
+                        result = true;
+                    } else {
+                        condition.values.forEach(function (value) {
+                            if (_.get(_this.data, condition.key) === value) result = true;
+                        });
+                    }
+                } else if (_.get(_this.data, condition.key) && !condition.mustExist) {
+                    result = true;
+                } else if (!_.get(_this.data, condition.key) && condition.mustExist) {
                     result = true;
                 }
             });

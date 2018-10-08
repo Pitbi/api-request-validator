@@ -130,11 +130,17 @@ class Validator {
         let result = false
         conditions.forEach(condition => {
             if (condition.values) {
-                condition.values.forEach(value => {
-                    if (_.get(this.data, condition.key) === value)
-                        result = true
-                })
-            } else if (_.get(this.data, condition.key)) {
+                if (!_.get(this.data, condition.key)) {
+                    result = true
+                } else {
+                    condition.values.forEach(value => {
+                        if (_.get(this.data, condition.key) === value)
+                            result = true
+                    })
+                }
+            } else if (_.get(this.data, condition.key) && !condition.mustExist) {
+                result = true
+            } else if (!_.get(this.data, condition.key) && condition.mustExist) {
                 result = true
             }
         })
