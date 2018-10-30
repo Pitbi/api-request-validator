@@ -299,7 +299,7 @@ var Validator = function () {
             var result = false;
             conditions.forEach(function (condition) {
                 if (condition.values) {
-                    if (!_.get(_this.data, condition.key)) {
+                    if (!_.get(_this.data, condition.key) && !condition.mustExist) {
                         result = true;
                     } else {
                         condition.values.forEach(function (value) {
