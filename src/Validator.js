@@ -76,7 +76,7 @@ class Validator {
     /*Check if value is in enum*/
     checkEnum(validation, data) {
         if (validation.enum && data && validation.enum.data.indexOf(data) === -1)
-            this.throw(validation, 'enum', { validationInfo: `Value must be: ${validation.enum.data}` })
+            this.throw(validation, 'enum', { validationInfo: `Allowed values: ${validation.enum.data}` })
     }
 
     checkRegexp(validation, data) {
